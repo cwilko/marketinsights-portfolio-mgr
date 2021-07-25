@@ -1,11 +1,11 @@
 from flask_restx import Api
 
-from .prices import api as ns1
+from .portfolio import api as ns1
 
 api = Api(
-    title='Price Store API',
+    title='Portfolio Manager API',
     version='1.0',
-    description='MarketInsights Price Store API',
+    description='MarketInsights Portfolio Manager API',
     # All API metadatas
 )
 

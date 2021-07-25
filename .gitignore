@@ -1,6 +1,4 @@
-*.hdf
-datasources/*
 .ipynb_checkpoints/
 apis/__pycache__
-notebooks/Sandbox.ipynb
+notebooks/*
 **/*.pyc
