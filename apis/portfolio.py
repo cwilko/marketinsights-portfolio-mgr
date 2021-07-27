@@ -1,6 +1,6 @@
 # import flask
 from flask_restx import Resource, reqparse, Namespace
-from flask import jsonify
+from flask import jsonify, request
 
 # import tradeframework
 from tradeframework.environments import SandboxEnvironment
@@ -16,7 +16,7 @@ environments = {}
 class EnvironmentList(Resource):
 
     parser = reqparse.RequestParser()
-    parser.add_argument('name', required=True, help='Model name')
+    parser.add_argument('name', required=True, help='Environment name')
 
     @api.doc(description='Get info for all environments')
     def get(self):
@@ -154,20 +154,21 @@ class PortfolioLinks(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('name', required=True, help='Portfolio name')
     parser.add_argument('optimizer', required=True, help='Optimizer type for the portfolio, options: EqualWeightsOptimizer, KellyOptimizer')
-    parser.add_argument('args', action='append', required=False, help='Optional list of arguments for the Optimizer')
+    parser.add_argument('options', type=dict, required=False, help='JSON object containing optimizer optional arguments', location='json')
 
     @api.doc(description='Create a new portfolio within a portfolio')
     @api.expect(parser, validate=True)
     def post(self, env_uuid, p_uuid):
 
         args = self.parser.parse_args()
+        options = request.get_json()["options"] if request.get_json() else {}
 
         try:
             if env_uuid in environments.keys():
                 env = environments[env_uuid]["environment"]
                 portfolios = environments[env_uuid]["portfolios"]
                 if p_uuid in portfolios.keys():
-                    portfolio = env.createPortfolio(args["name"], env.createOptimizer(args["name"] + "_optimizer", args["optimizer"]))
+                    portfolio = env.createPortfolio(args["name"], env.createOptimizer(args["name"] + "_optimizer", args["optimizer"]), options)
                     portfolios[p_uuid].addAsset(portfolio)
                     portfolios[portfolio.getId()] = portfolio
                     results = {"rc": "success", "portfolio": json.loads(str(portfolio))}
@@ -187,13 +188,14 @@ class ModelLinks(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('name', required=True, help='Model name')
     parser.add_argument('type', required=True, help='Model type, e.g: BuyAndHold, TrendFollowing')
-    parser.add_argument('args', action='append', required=False, help='Optional list of arguments for the model')
+    parser.add_argument('options', type=dict, required=False, help='JSON object containing model optional arguments', location='json')
 
     @api.doc(description='Create a new model within a portfolio')
     @api.expect(parser, validate=True)
     def post(self, env_uuid, p_uuid):
 
         args = self.parser.parse_args()
+        options = request.get_json()["options"] if request.get_json() else {}
 
         try:
             if env_uuid in environments.keys():
@@ -201,7 +203,7 @@ class ModelLinks(Resource):
                 portfolios = environments[env_uuid]["portfolios"]
                 models = environments[env_uuid]["models"]
                 if p_uuid in portfolios.keys():
-                    model = env.createModel(args["name"], args["type"])
+                    model = env.createModel(args["name"], args["type"], options)
                     portfolios[p_uuid].addAsset(model)
                     models[model.getId()] = model
                     results = {"rc": "success", "model": json.loads(str(model))}
