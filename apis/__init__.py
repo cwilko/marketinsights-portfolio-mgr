@@ -1,6 +1,7 @@
 from flask_restx import Api
 
-from .portfolio import api as ns1
+from .signals import api as ns1
+
 
 api = Api(
     title='Portfolio Manager API',

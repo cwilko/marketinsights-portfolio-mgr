@@ -2,3 +2,4 @@
 apis/__pycache__
 notebooks/*
 **/*.pyc
+.cache
