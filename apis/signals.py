@@ -27,7 +27,6 @@ class Signals(Resource):
         try:
             if env_uuid in environments.keys():
                 env = environments[env_uuid]["environment"]
-                print(env.getPortfolio())
                 results = {"rc": "success", "result": trader.getCurrentSignal(env.getPortfolio(), int(capital))}
             else:
                 results = {"rc": "fail", "msg": "Environment ID not found"}
