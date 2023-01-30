@@ -95,8 +95,6 @@ class ModelLinks(Resource):
         args = self.parser.parse_args()
         options = request.get_json()["options"] if request.get_json() and request.get_json()["options"] else {}
 
-        print(options)
-
         try:
             if env_uuid in environments.keys():
                 env = environments[env_uuid]["environment"]

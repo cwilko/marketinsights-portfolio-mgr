@@ -30,7 +30,6 @@ class EnvironmentList(Resource):
     def post(self):
 
         args = self.parser.parse_args()
-
         try:
             env = SandboxEnvironment(args["name"], args["tz"])
             portfolio = env.createPortfolio(args["name"] + "_portfolio")

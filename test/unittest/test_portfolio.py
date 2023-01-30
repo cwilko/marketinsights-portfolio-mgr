@@ -18,32 +18,46 @@ class FrameworkTest(unittest.TestCase):
         self.tf = TradeFramework("http://localhost:8080")
 
         # Get Market Data
-        mds = MarketDataSource("MDSConnector", options={"remote": True, "location": "http://pricestore.192.168.1.203.nip.io"})
-        aggregator = MarketDataAggregator([mds])
 
-        market = {
-            "ID": "DOW"
-        }
+        data_config = [
+            {
+                "ID": "MDS",
+                "class": "MDSConnector",
+                "opts": {
+                    "remote": True,
+                    "location": "http://pricestore.192.168.1.203.nip.io"
+                },
+                "timezone": "UTC",
+                "markets": [
+                    {
+                        "ID": "DOW",
+                        "sources": [
+                            {
+                                "ID": "WallSt-hourly",
+                                "sample_unit": "H"
+                            },
+                            {
+                                "ID": "D&J-IND",
+                                "sample_unit": "5min"
+                            }
+                        ]
+                    }
+                ]
 
-        sources = [
-            {
-                "ID": "WallSt-hourly",
-                "sample_unit": "H"
-            },
-            {
-                "ID": "D&J-IND",
-                "sample_unit": "5min"
             }
         ]
 
-        start = "2013-01-01"
-        end = "2013-07-11"
+        aggregator = MarketDataAggregator(data_config)
 
-        marketData = aggregator.getData(market, sources, "H", start, end, debug=True)
-        marketData = marketData.reset_index().set_index("Date_Time")[["Open", "Close"]]
+        start = "2013-01-01"
+        end = "2013-07-10 18:00"
+
+        marketData = aggregator.getData("DOW", "H", start, end, debug=True)
+        marketData = marketData.reset_index().set_index("Date_Time")[["Open", "High", "Low", "Close"]]
         ts = ppl.removeNaNs(marketData)
         #ts.index = ts.index.tz_localize('UTC')
         #ts = ts.tz_convert("US/Eastern", level=0)
+
         self.asset = Asset("DOW", ts)
 
     def test_signals(self):
@@ -59,9 +73,9 @@ class FrameworkTest(unittest.TestCase):
         # Get signals
         signal = self.tf.getSignal(env_uuid, 10000, debug=False)
 
-        print(signal)
-
-        self.assertTrue(np.allclose(signal["result"]["value"], 0.994278195069851))
+        # Jan'23: Bug: Original value here was based on date that missed July 1st 2013 data!
+        # Jan'23: Bug: To ensure test_predictions (below) works, the time series needs to run to 2pm on 2013-07-10
+        self.assertTrue(np.allclose(signal["result"]["value"], 0.9912554640452014))
 
     def test_predictions(self):
         response = self.tf.createEnvironment("TestEnv", "US/Eastern")
@@ -83,9 +97,9 @@ class FrameworkTest(unittest.TestCase):
         # Get signals
         signals = self.tf.createPredictions(env_uuid, {"prices": possibles}, "DOW", 10000, debug=False)
 
-        self.assertEqual(signals["result"][9]["markets"][0]["signal"], "BUY")
+        self.assertEqual(signals["result"][9]["markets"][0]["signal"], "SELL")
         self.assertEqual(signals["result"][10]["markets"][0]["signal"], "HOLD")
-        self.assertEqual(signals["result"][11]["markets"][0]["signal"], "SELL")
+        self.assertEqual(signals["result"][11]["markets"][0]["signal"], "BUY")
 
 if __name__ == '__main__':
     unittest.main()

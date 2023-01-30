@@ -23,7 +23,6 @@ class Signals(Resource):
 
         args = self.parser.parse_args()
         capital = args["capital"] if args["capital"] else 1
-
         try:
             if env_uuid in environments.keys():
                 env = environments[env_uuid]["environment"]
