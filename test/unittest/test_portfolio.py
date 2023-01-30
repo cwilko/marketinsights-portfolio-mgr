@@ -15,7 +15,13 @@ dir = os.path.dirname(os.path.abspath(__file__))
 class FrameworkTest(unittest.TestCase):
 
     def setUp(self):
-        self.tf = TradeFramework("http://localhost:8080")
+        HOST = os.getenv('TRAVIS_APP_HOST')
+        if not HOST:
+            HOST = "localhost"
+
+        print(HOST)
+
+        self.tf = TradeFramework("http://" + HOST + ":8080")
 
         # Get Market Data
 
