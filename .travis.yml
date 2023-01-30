@@ -15,6 +15,7 @@ before_install:
   - pip install -U pip
   - pip install -U importlib-metadata
   - pip install -U pytest
+  - pip install ./test/requirements.txt
 
 install:
  # - pip install . # install package + test dependencies

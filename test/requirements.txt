@@ -1,0 +1,6 @@
+quantutils @ git+https://github.com/cwilko/quantutils.git#egg=quantutils
+tradeframework @ git+https://github.com/cwilko/tradeframework.git#egg=tradeframework
+MIPriceAggregator @ git+https://github.com/cwilko/marketinsights-price-aggregator.git#egg=MIPriceAggregator
+numpy==1.21.4
+pandas==1.3.5
+requests==2.27.1
