@@ -15,7 +15,7 @@ before_install:
   - pip install -U pip
   - pip install -U importlib-metadata
   - pip install -U pytest
-  - pip install ./test/requirements.txt
+  - pip install -r ./test/requirements.txt
 
 install:
  # - pip install . # install package + test dependencies
@@ -25,6 +25,7 @@ install:
 
 before_script:
   - python app.py &
+  - sleep 5
 
 script:
   - pytest # run tests
