@@ -13,6 +13,7 @@ branches:
 before_install:
   - python --version
   - pip install -U pip
+  - pip install -U importlib-metadata
   - pip install -U pytest
 
 install:
