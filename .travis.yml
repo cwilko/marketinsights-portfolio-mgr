@@ -1,4 +1,7 @@
 sudo: required
+language: python
+python:
+  - 3.6
 
 services:
   - docker
@@ -7,11 +10,21 @@ branches:
   only:
     - master
 
+before_install:
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest
+
 install:
-  - curl -L https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz | tar zxvf - -C . && mv qemu-3.0.0+resin-arm/qemu-arm-static .
-  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-  - docker build -t cwilko/mi-portfolio-mgr .
+  - pip install . # install package + test dependencies
+ # - curl -L https://github.com/balena-io/qemu/releases/download/v3.0.0%2Bresin/qemu-3.0.0+resin-arm.tar.gz | tar zxvf - -C . && mv qemu-3.0.0+resin-arm/qemu-arm-static .
+ # - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+ # - docker build -t cwilko/mi-portfolio-mgr .
+
+before_script:
+  - python app.py &
 
 script:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push cwilko/mi-portfolio-mgr
+  - pytest # run tests
+ # - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+ # - docker push cwilko/mi-portfolio-mgr
