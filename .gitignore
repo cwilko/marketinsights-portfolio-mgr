@@ -1,6 +1,7 @@
 .ipynb_checkpoints/
-apis/__pycache__
+__pycache__
 notebooks/*
 **/*.pyc
 .cache
 *.hdf
+.pytest_cache
