@@ -28,7 +28,7 @@ jobs:
         run: |
           python app.py &
           sleep 5
-          pytest
+          pytest ./test/unittest/test_portfolio.py 
 
   docker:
     runs-on: ubuntu-latest

@@ -3,7 +3,9 @@ import os
 import json
 import numpy as np
 import pandas as pd
+import quantutils.dataset.pipeline as ppl
 from quantutils.api.backtest import TradeFramework
+from MIPriceAggregator.api.aggregator import MarketDataAggregator
 from tradeframework.api import Asset
 import tradeframework.operations.utils as utils
 
@@ -21,17 +23,48 @@ class FrameworkTest(unittest.TestCase):
 
         self.tf = TradeFramework("http://" + HOST + ":8080")
 
-        #start = "2013-01-01"
-        #end = "2013-07-10 18:00"
-        #marketData = aggregator.getData("DOW", "H", start, end, debug=True)
-        #marketData = ppl.removeNaNs(marketData)
+        # Get Market Data
 
-        marketData = pd.read_csv(dir + "/data/test.csv")
+        data_config = [
+            {
+                "ID": "MDS",
+                "class": "MDSConnector",
+                "opts": {
+                    "remote": True,
+                    "location": "http://pricestore.192.168.1.203.nip.io"
+                },
+                "timezone": "UTC",
+                "markets": [
+                    {
+                        "ID": "DOW",
+                        "sources": [
+                            {
+                                "ID": "WallSt-hourly",
+                                "sample_unit": "H"
+                            },
+                            {
+                                "ID": "D&J-IND",
+                                "sample_unit": "5min"
+                            }
+                        ]
+                    }
+                ]
+
+            }
+        ]
+
+        aggregator = MarketDataAggregator(data_config)
+
+        start = "2013-01-01"
+        end = "2013-07-10 18:00"
+
+        marketData = aggregator.getData("DOW", "H", start, end, debug=True)
         marketData = marketData.reset_index().set_index("Date_Time")[["Open", "High", "Low", "Close"]]
+        ts = ppl.removeNaNs(marketData)
         #ts.index = ts.index.tz_localize('UTC')
         #ts = ts.tz_convert("US/Eastern", level=0)
 
-        self.asset = Asset("DOW", marketData)
+        self.asset = Asset("DOW", ts)
 
     def test_signals(self):
         response = self.tf.createEnvironment("TestEnv", "US/Eastern")
