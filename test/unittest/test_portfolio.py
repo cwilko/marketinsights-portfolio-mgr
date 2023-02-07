@@ -15,7 +15,7 @@ dir = os.path.dirname(os.path.abspath(__file__))
 class FrameworkTest(unittest.TestCase):
 
     def setUp(self):
-        HOST = os.getenv('TRAVIS_APP_HOST')
+        HOST = os.getenv('HOSTNAME')
         if not HOST:
             HOST = "localhost"
 
