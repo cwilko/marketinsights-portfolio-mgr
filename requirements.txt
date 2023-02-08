@@ -1,4 +1,4 @@
-tradeframework @ git+https://github.com/cwilko/tradeframework.git#egg=tradeframework
+tradeframework @ git+https://github.com/cwilko/tradeframework.git@v0.1.0
 Flask>=1.1.4 
 flasgger>=0.6.4 
 Flask-Cors>=3.0.2  
