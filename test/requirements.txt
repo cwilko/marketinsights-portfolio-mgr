@@ -1,4 +1,5 @@
 quantutils @ git+https://github.com/cwilko/quantutils.git#egg=quantutils
+#marketinsights-price-aggregator @ git+https://github.com/cwilko/marketinsights-price-aggregator.git
 tradeframework @ git+https://github.com/cwilko/tradeframework.git@v0.1.0
 Flask>=1.1.4 
 flasgger>=0.6.4 

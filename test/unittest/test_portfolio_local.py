@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import quantutils.dataset.pipeline as ppl
 from quantutils.api.backtest import TradeFramework
-from MIPriceAggregator.api.aggregator import MarketDataAggregator
+from marketinsights.api.aggregator import MarketDataAggregator
 from tradeframework.api import Asset
 import tradeframework.operations.utils as utils
 
