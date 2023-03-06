@@ -3,8 +3,8 @@ from flask_restx import Resource, reqparse
 from flask import jsonify, request
 
 from tradeframework.api import Asset
-from .models import environments as environments
-from .models import api as api
+from marketinsights.server.portfoliomgr.models import environments as environments
+from marketinsights.server.portfoliomgr.models import api as api
 
 import json
 import pandas

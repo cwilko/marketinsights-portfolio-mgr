@@ -1,0 +1,1 @@
+marketinsights-portfolio-mgr @ git+https://github.com/cwilko/marketinsights-portfolio-mgr.git

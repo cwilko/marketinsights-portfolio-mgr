@@ -1,7 +1,12 @@
+*.py[cod]
 .ipynb_checkpoints/
-__pycache__
-notebooks/*
-**/*.pyc
-.cache
+test/.~lock*
+.pytest_cache/
+__pycache__/
+test/data
+.cache/
+**/test-reports
+**/*egg-info
 *.hdf
-.pytest_cache
+*.pkl
+build/

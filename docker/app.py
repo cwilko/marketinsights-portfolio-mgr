@@ -1,8 +1,8 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 from flask_sslify import SSLify
-from apis import api
-import os
+from marketinsights.server.portfoliomgr import api
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 64 * 1024 * 1024  # 64 MB

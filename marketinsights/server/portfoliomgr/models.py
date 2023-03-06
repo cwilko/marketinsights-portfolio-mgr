@@ -2,8 +2,8 @@
 from flask_restx import Resource
 from flask import jsonify
 
-from .portfolios import environments as environments
-from .portfolios import api as api
+from marketinsights.server.portfoliomgr.portfolios import environments as environments
+from marketinsights.server.portfoliomgr.portfolios import api as api
 import json
 
 

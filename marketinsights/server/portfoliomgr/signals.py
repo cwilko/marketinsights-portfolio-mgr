@@ -2,8 +2,8 @@
 from flask_restx import Resource, reqparse
 from flask import jsonify, request
 
-from .assets import environments as environments
-from .assets import api as api
+from marketinsights.server.portfoliomgr.assets import environments as environments
+from marketinsights.server.portfoliomgr.assets import api as api
 import tradeframework.operations.trader as trader
 from tradeframework.api import Asset
 
