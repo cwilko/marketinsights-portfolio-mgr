@@ -6,7 +6,7 @@ import pandas as pd
 import quantutils.dataset.pipeline as ppl
 from quantutils.api.backtest import TradeFramework
 from marketinsights.api.aggregator import MarketDataAggregator
-from tradeframework.api import Asset
+from tradeframework.api.core import Asset
 import tradeframework.operations.utils as utils
 
 dir = os.path.dirname(os.path.abspath(__file__))
@@ -58,23 +58,29 @@ class FrameworkTest(unittest.TestCase):
         start = "2013-01-01"
         end = "2013-07-10 18:00"
 
-        marketData = aggregator.getData("DOW", "H", start, end, debug=True)
+        marketData = aggregator.getData("DOW", "H", start, end, debug=False)
         marketData = marketData.reset_index().set_index("Date_Time")[["Open", "High", "Low", "Close"]]
         ts = ppl.removeNaNs(marketData)
-        #ts.index = ts.index.tz_localize('UTC')
-        #ts = ts.tz_convert("US/Eastern", level=0)
+        # ts.index = ts.index.tz_localize('UTC')
+        # ts = ts.tz_convert("US/Eastern", level=0)
 
-        self.asset = Asset("DOW", ts)
+        self.marketData = ts
 
     def test_signals(self):
         response = self.tf.createEnvironment("TestEnv", "US/Eastern")
         env_uuid = response["environment"]["id"]
         p_uuid = response["environment"]["portfolio"]["id"]
 
-        response = self.tf.createModel(env_uuid, p_uuid, "TestModel", "TrendFollowing", opts={"start": "15:00", "end": "16:00", "barOnly": True})
+        # Create prices
+        response = self.tf.appendAsset(env_uuid, "DOW", json.loads(self.marketData.to_json(orient='split', date_format="iso")), debug=True)
 
-        # Append prices
-        response = self.tf.appendAsset(env_uuid, "DOW", json.loads(self.asset.values.to_json(orient='split', date_format="iso")), debug=False)
+        response = self.tf.createModel(env_uuid, p_uuid, "TestModel", "TrendFollowing", opts={"start": "15:00", "end": "16:00", "barOnly": True})
+        print(response)
+        m_uuid = response["model"]["id"]
+
+        response = self.tf.addStoredAsset(env_uuid, m_uuid, "DOW")
+
+        response = self.tf.refresh(env_uuid)
 
         # Get signals
         signal = self.tf.getSignal(env_uuid, 10000, debug=False)
@@ -88,10 +94,15 @@ class FrameworkTest(unittest.TestCase):
         env_uuid = response["environment"]["id"]
         p_uuid = response["environment"]["portfolio"]["id"]
 
-        response = self.tf.createModel(env_uuid, p_uuid, "TestModel", "TrendFollowing", opts={"start": "15:00", "end": "16:00", "barOnly": True})
+        # Create prices
+        response = self.tf.appendAsset(env_uuid, "DOW", json.loads(self.marketData.to_json(orient='split', date_format="iso")), debug=False)
 
-        # Append prices
-        response = self.tf.appendAsset(env_uuid, "DOW", json.loads(self.asset.values.to_json(orient='split', date_format="iso")), debug=False)
+        response = self.tf.createModel(env_uuid, p_uuid, "TestModel", "TrendFollowing", opts={"start": "15:00", "end": "16:00", "barOnly": True})
+        m_uuid = response["model"]["id"]
+
+        response = self.tf.addStoredAsset(env_uuid, m_uuid, "DOW")
+
+        response = self.tf.refresh(env_uuid)
 
         possibles = []
 
@@ -103,9 +114,9 @@ class FrameworkTest(unittest.TestCase):
         # Get signals
         signals = self.tf.createPredictions(env_uuid, {"prices": possibles}, "DOW", 10000, debug=False)
 
-        self.assertEqual(signals["result"][9]["markets"][0]["signal"], "SELL")
-        self.assertEqual(signals["result"][10]["markets"][0]["signal"], "HOLD")
-        self.assertEqual(signals["result"][11]["markets"][0]["signal"], "BUY")
+        self.assertEqual(signals["result"][9][0]["markets"][0]["signal"], "SELL")
+        self.assertEqual(signals["result"][10][0]["markets"][0]["signal"], "HOLD")
+        self.assertEqual(signals["result"][11][0]["markets"][0]["signal"], "BUY")
 
 if __name__ == '__main__':
     unittest.main()

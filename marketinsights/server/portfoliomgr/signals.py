@@ -5,7 +5,7 @@ from flask import jsonify, request
 from marketinsights.server.portfoliomgr.assets import environments as environments
 from marketinsights.server.portfoliomgr.assets import api as api
 import tradeframework.operations.trader as trader
-from tradeframework.api import Asset
+from tradeframework.api.core import Asset
 
 import json
 import pandas
@@ -26,7 +26,7 @@ class Signals(Resource):
         try:
             if env_uuid in environments.keys():
                 env = environments[env_uuid]["environment"]
-                results = {"rc": "success", "result": trader.getCurrentSignal(env.getPortfolio(), int(capital))}
+                results = {"rc": "success", "result": trader.getCurrentSignal(derivative=env.getPortfolio(), capital=int(capital))}
             else:
                 results = {"rc": "fail", "msg": "Environment ID not found"}
         except ValueError as e:
@@ -64,7 +64,7 @@ class Predictions(Resource):
                     price.index = price.index.tz_convert(env.getTimezone())
                     prices.append(Asset(args["market"], price))
 
-                results = {"rc": "success", "result": trader.predictSignals(env, prices, int(capital))}
+                results = {"rc": "success", "result": trader.predictSignals(derivative=env.getPortfolio(), prices=prices, capital=int(capital))}
             else:
                 results = {"rc": "fail", "msg": "Environment ID not found"}
         except ValueError as e:

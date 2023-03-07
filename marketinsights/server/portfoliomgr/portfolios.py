@@ -66,7 +66,7 @@ class PortfolioLinks(Resource):
                 env = environments[env_uuid]["environment"]
                 portfolios = environments[env_uuid]["portfolios"]
                 if p_uuid in portfolios.keys():
-                    portfolio = env.createPortfolio(args["name"], env.createOptimizer(args["name"] + "_optimizer", args["optimizer"]), options)
+                    portfolio = env.createDerivative(args["name"], weightGenerator=env.createOptimizer(args["optimizer"], opts=options))
                     portfolios[p_uuid].addAsset(portfolio)
                     portfolios[portfolio.getId()] = portfolio
                     results = {"rc": "success", "portfolio": json.loads(str(portfolio))}
@@ -99,12 +99,41 @@ class ModelLinks(Resource):
             if env_uuid in environments.keys():
                 env = environments[env_uuid]["environment"]
                 portfolios = environments[env_uuid]["portfolios"]
-                models = environments[env_uuid]["models"]
                 if p_uuid in portfolios.keys():
-                    model = env.createModel(args["name"], args["type"], options)
-                    portfolios[p_uuid].addAsset(model)
-                    models[model.getId()] = model
-                    results = {"rc": "success", "model": json.loads(str(model))}
+                    portfolio = env.createDerivative(args["name"], weightGenerator=env.createModel(args["type"], opts=options))
+                    portfolios[p_uuid].addAsset(portfolio)
+                    portfolios[portfolio.getId()] = portfolio
+                    results = {"rc": "success", "model": json.loads(str(portfolio))}
+                else:
+                    results = {"rc": "fail", "msg": "Portfolio ID not found"}
+            else:
+                results = {"rc": "fail", "msg": "Environment ID not found"}
+        except ValueError as e:
+            results = {"rc": "fail", "msg": str(e)}
+
+        return jsonify(results)
+
+
+@api.route('/<env_uuid>/portfolios/<p_uuid>/assets')
+class AssetLinks(Resource):
+
+    parser = reqparse.RequestParser()
+    parser.add_argument('name', required=True, help='Asset name')
+
+    @api.doc(description='Add a stored asset to a portfolio')
+    @api.expect(parser, validate=True)
+    def post(self, env_uuid, p_uuid):
+
+        args = self.parser.parse_args()
+
+        try:
+            if env_uuid in environments.keys():
+                env = environments[env_uuid]["environment"]
+                portfolios = environments[env_uuid]["portfolios"]
+                if p_uuid in portfolios.keys():
+                    asset = env.getAssetStore().getAsset(args["name"])
+                    portfolios[p_uuid].addAsset(asset)
+                    results = {"rc": "success", "asset": json.loads(str(asset))}
                 else:
                     results = {"rc": "fail", "msg": "Portfolio ID not found"}
             else:

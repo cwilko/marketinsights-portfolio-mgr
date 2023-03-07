@@ -32,7 +32,7 @@ class EnvironmentList(Resource):
         args = self.parser.parse_args()
         try:
             env = SandboxEnvironment(args["name"], args["tz"])
-            portfolio = env.createPortfolio(args["name"] + "_portfolio")
+            portfolio = env.createDerivative(args["name"] + "_portfolio")
             env.setPortfolio(portfolio)
             environments[env.getId()] = {"environment": env, "portfolios": {portfolio.getId(): portfolio}, "models": {}}
             results = {"rc": "success", "environment": json.loads(str(env)), "portfolio": json.loads(str(portfolio))}
@@ -69,4 +69,19 @@ class Environment(Resource):
                 results = {"rc": "fail", "msg": "Environment ID not found"}
         except Exception as e:
             results = {"rc": "fail", "msg": str(e)}
+        return jsonify(results)
+
+    @api.doc(description='Refresh the environment')
+    def post(self, env_uuid):
+
+        try:
+            if env_uuid in environments.keys():
+                env = environments[env_uuid]["environment"]
+                portfolio = env.refresh()
+                results = {"rc": "success", "portfolio": json.loads(str(portfolio))}
+            else:
+                results = {"rc": "fail", "msg": "Environment ID not found"}
+        except ValueError as e:
+            results = {"rc": "fail", "msg": str(e)}
+
         return jsonify(results)
