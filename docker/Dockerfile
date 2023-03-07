@@ -15,6 +15,6 @@ RUN apt-get -y update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install --extra-index-url https://www.piwheels.org/simple -r requirements.txt
+RUN pip install -U --extra-index-url https://www.piwheels.org/simple -r requirements.txt
 
 CMD ["python", "-u", "app.py"]
