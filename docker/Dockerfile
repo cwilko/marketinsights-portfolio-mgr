@@ -1,4 +1,4 @@
-FROM arm64v8/python:3.9-slim-bullseye as target-arm64
+FROM arm64v8/python:3.8-slim-bullseye as target-arm64
 
 FROM arm32v7/python:3.7-slim-buster as target-armv7
 
