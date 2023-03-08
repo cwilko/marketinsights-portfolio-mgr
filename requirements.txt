@@ -1,5 +1,4 @@
 tradeframework @ git+https://github.com/cwilko/tradeframework.git
-tradeframework-insights @ git+https://github.com/cwilko/tradeframework-insights.git
 Flask>=2.2.3
 Flask-Cors>=3.0.10
 Flask-SSLify>=0.1.5
