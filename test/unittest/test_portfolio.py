@@ -3,9 +3,7 @@ import os
 import json
 import numpy as np
 import pandas as pd
-# TODO - this shouldn't be in quantutils
-from quantutils.api.backtest import TradeFramework
-from tradeframework.api.core import Asset
+from marketinsights.remote.portfoliomgr import TradeFramework
 import tradeframework.operations.utils as utils
 
 dir = os.path.dirname(os.path.abspath(__file__))

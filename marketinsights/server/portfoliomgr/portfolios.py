@@ -2,8 +2,8 @@
 from flask_restx import Resource, reqparse
 from flask import jsonify, request
 
-from .environments import environments as environments
-from .environments import api as api
+from marketinsights.server.portfoliomgr.environments import environments as environments
+from marketinsights.server.portfoliomgr.environments import api as api
 
 import json
 
